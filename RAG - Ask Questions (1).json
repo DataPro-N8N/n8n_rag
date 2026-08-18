@@ -1,0 +1,332 @@
+{
+  "name": "RAG - Ask Questions",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "RAG Document Upload",
+        "formDescription": "Upload a document to add it to the RAG knowledge base.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload Document",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -240,
+        -48
+      ],
+      "id": "dd3ade5a-0612-4f5b-b0b4-b2c87cbfd535",
+      "name": "On form submission",
+      "webhookId": "f5e0ba78-c872-4b77-a6b5-3423bf0c7b16"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Upload_Document",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -48
+      ],
+      "id": "6ba7cd44-144b-46f6-ae54-34dfd2554e60",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        -48
+      ],
+      "id": "bfafd4ae-9ced-4a9d-918c-0a765686996c",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {
+        "model": "=nomic-embed-text"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        304,
+        160
+      ],
+      "id": "ec307e50-8b4b-4b67-a059-4588042150f8",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "3SN8JisEV1HpYwqZ",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "text",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        208
+      ],
+      "id": "ed0c92f9-6a17-4fa5-bc56-62c16700a68b",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        512,
+        416
+      ],
+      "id": "47457e19-77d4-41df-95b9-c52cc63c4cf9",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        800,
+        -208
+      ],
+      "id": "8ac760b9-141b-4bf5-a4ae-62a82457e676",
+      "name": "When chat message received",
+      "webhookId": "bde1a8d1-3194-41d8-b868-594d41da5c23"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -48
+      ],
+      "id": "8f084e79-56e8-4d70-94ba-9d51fd592be6",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "3SN8JisEV1HpYwqZ",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.2,
+      "position": [
+        1056,
+        -208
+      ],
+      "id": "450a376c-a9ea-46ec-ae6a-1770b180a77d",
+      "name": "Question and Answer Chain1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        32
+      ],
+      "id": "4e008b2f-e879-40ab-8b4b-c42e29ad7993",
+      "name": "Vector Store Retriever1"
+    },
+    {
+      "parameters": {
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        1152,
+        224
+      ],
+      "id": "a4652fee-d553-4037-86b7-945313d4e708",
+      "name": "Simple Vector Store2"
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        416
+      ],
+      "id": "d1a23dc5-51e2-40ea-91c2-f3ffd51ebfd7",
+      "name": "Embeddings Ollama1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "3SN8JisEV1HpYwqZ",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever1": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain1",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever1",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f43042c7-a332-4d7f-9954-b77e6de91d6d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d4fc8c3c940b9ce5da7487791518b7a332e4c114a0699001d95b505c4be19998"
+  },
+  "nodeGroups": [],
+  "id": "wQhot0X9Q3RazPgc",
+  "tags": []
+}
